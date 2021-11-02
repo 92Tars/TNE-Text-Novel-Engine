@@ -1,4 +1,7 @@
 # TNE-Text-Novel-Engine-v1.0
-TNE (Text Novel Engine) v1.0
 
 2018년 대학 과제로 만들었던 것
+
+TODO 
+- 조금 수정한 부분 정상작동 되는지 확인
+- 숫자조합형으로 if문 떡칠 안하고 편하게 링크 짤 수 있도록 하는 기능 구현하기
