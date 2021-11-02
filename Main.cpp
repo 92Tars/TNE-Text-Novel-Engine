@@ -32,24 +32,27 @@ int main()
 //게임 작동부
 int Game_Loop()
 {
-	//Game_Script_Changer
+	//텍스트 파일 불러오는 곳
 	char File_name[32] = "Script/Script_";
 	sprintf(&Status.room_char, "%d", Status.room);
 	strcat(File_name, &Status.room_char);
 	strcat(File_name, ".txt");
 	//-----------------------
+
+	//해당하는 대사 스크립트가 없을 시...
 	if ((Game_Script = fopen(File_name, "r")) == NULL)
 	{
 		printf(" '%s' 라는 게임 대사 스크립트가 발견되지 않았습니다! 게임을 실행할 수 없습니다!", File_name);
 		fgetc(stdin);
-		exit(1);
+		exit(1); 
 	}
 
 	int i = 0; // Flush init
 
+	//스크립트 출력부
 	while ((buffer = fgetc(Game_Script)) != EOF)//End_Of_Line이 나올 때 까지 출력한다.
 	{
-		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화;
+		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
 
 		FLUSH;
 		while ((buffer = fgetc(Game_Script)) != '@') //'@'표시가 나올 때 까지 Script_Buffer를 채운다.
@@ -57,16 +60,17 @@ int Game_Loop()
 			Script_Buffer[i] = buffer;
 			i++;
 		}
-		Script_Buffer[i + 1] = NULL; //끝냄표시
-
+		Script_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
 
 		FLUSH;
+
 		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
 		{
 			printf("%c", Script_Buffer[i]); //버퍼출력
 			i++;
-			Sleep(10);
+			Sleep(10); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
 
+			//분기점 포인트
 			if (Script_Buffer[i] == '$')
 			{
 				retry:
