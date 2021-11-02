@@ -9,7 +9,7 @@
                                                              |___/               
 
 	TNE (Text Novel Engine) v1.0 by 92Tars
-	Copyright 2018.
+	Copyright 2018~2021.
 */
 
 #pragma once

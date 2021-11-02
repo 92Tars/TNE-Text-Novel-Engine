@@ -9,7 +9,7 @@
 															 |___/
 
 	TNE (Text Novel Engine) v1.0 by 92Tars
-	Copyright 2018.
+	Copyright 2018~2021.
 
 */
 
@@ -72,7 +72,6 @@ int Game_Loop()
 				retry:
 				printf("\n당신의 선택은? >> ");
 				scanf("%d", &my_select);
-
 				Status.next_room = Route_Select(Status.room, my_select);
 
 				//오타 예외 처리
