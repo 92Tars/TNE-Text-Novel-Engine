@@ -17,6 +17,7 @@
 #define FLUSH i = 0
 #define ENTER printf("\n");
 #define DOUBLE_ENTER printf("\n\n");
+#define WINDOW_CLEAR system("cls");
 
 #include <stdio.h>
 #include <string.h>
@@ -44,5 +45,5 @@ int Route_Select(int room, int select);
 void Auto_Save(int room_no);
 int Load_Save();
 int main_menu();
+int ending_menu();
 void intro();
-

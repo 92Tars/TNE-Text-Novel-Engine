@@ -18,95 +18,19 @@
 
 int main()
 {
-	intro();
-	
+	restart:
+	intro(); 
 	Status.room = main_menu();
-
 	while(true) if (Game_Loop() == 1) break;
 	
-	printf("\n\n게임 끝...");
+	if (ending_menu() == 0) goto restart;
+
 	fgetc(stdin);
 	return 0;
 }
 
-//게임 작동부
-int Game_Loop()
-{
-	//텍스트 파일 불러오는 곳
-	char File_name[32] = "Script/Script_";
-	sprintf(&Status.room_char, "%d", Status.room);
-	strcat(File_name, &Status.room_char);
-	strcat(File_name, ".txt");
-	//-----------------------
-
-	//해당하는 대사 스크립트가 없을 시...
-	if ((Game_Script = fopen(File_name, "r")) == NULL)
-	{
-		printf(" '%s' 라는 게임 대사 스크립트가 발견되지 않았습니다! 게임을 실행할 수 없습니다!", File_name);
-		fgetc(stdin);
-		exit(1); 
-	}
-
-	int i = 0; // Flush init
-
-	//스크립트 출력부
-	while ((buffer = fgetc(Game_Script)) != EOF)//End_Of_Line이 나올 때 까지 출력한다.
-	{
-		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
-
-		FLUSH;
-		while ((buffer = fgetc(Game_Script)) != '@') //'@'표시가 나올 때 까지 Script_Buffer를 채운다.
-		{
-			Script_Buffer[i] = buffer;
-			i++;
-		}
-		Script_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
-
-		FLUSH;
-
-		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
-		{
-			printf("%c", Script_Buffer[i]); //버퍼출력
-			i++;
-			Sleep(10); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
-
-			//분기점 포인트
-			if (Script_Buffer[i] == '$')
-			{
-				retry:
-				printf("\n당신의 선택은? >> ");
-				scanf("%d", &my_select);
-				Status.next_room = Route_Select(Status.room, my_select);
-
-				//오타 예외 처리
-				if (Status.next_room == 404)
-				{
-					printf("잘못된 선택입니다!\n\n");
-					goto retry;
-				}
-
-				ENTER;
-
-				printf("%d 번을 선택했습니다.\n", my_select);
-
-				fgetc(stdin);
-
-				Status.room = Status.next_room;
-				Auto_Save(Status.room);
-			}
-
-			if (Script_Buffer[i] == '_') return 1; //게임 끝! 
-		}
-
-		fgetc(stdin); //키입력 대기
-	}
-
-	fclose(Game_Script);
-	return 0;
-}
-
-//루트 파일 선택
-//이 부분을 수정하면 다른 이야기도 만들 수 있다.
+/*          루트 파일 선택
+이 부분을 수정하면 다른 이야기도 만들 수 있다.*/
 int Route_Select(int room, int select)
 {
 	//Room 1
@@ -185,29 +109,94 @@ int Route_Select(int room, int select)
 	else return 404;
 }
 
+//게임 작동부
+int Game_Loop()
+{
+	//텍스트 파일 불러오는 곳
+	char File_name[32] = "Script/Script_";
+	sprintf(&Status.room_char, "%d", Status.room);
+	strcat(File_name, &Status.room_char);
+	strcat(File_name, ".txt");
+	//-----------------------
+
+	//해당하는 대사 스크립트가 없을 시...
+	if ((Game_Script = fopen(File_name, "r")) == NULL)
+	{
+		printf(" '%s' 라는 게임 대사 스크립트가 발견되지 않았습니다! 게임을 실행할 수 없습니다!", File_name);
+		fgetc(stdin);
+		exit(1); 
+	}
+
+	int i = 0; // Flush init
+
+	//스크립트 출력부
+	while ((buffer = fgetc(Game_Script)) != EOF)//End_Of_Line이 나올 때 까지 출력한다.
+	{
+		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
+
+		FLUSH;
+		while ((buffer = fgetc(Game_Script)) != '@') //'@'표시가 나올 때 까지 Script_Buffer를 채운다.
+		{
+			Script_Buffer[i] = buffer;
+			i++;
+		}
+		Script_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
+
+		FLUSH;
+
+		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
+		{
+			printf("%c", Script_Buffer[i]); //버퍼출력
+			i++;
+			Sleep(10); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
+
+			//분기점 포인트
+			if (Script_Buffer[i] == '$')
+			{
+				retry:
+				printf("\n당신의 선택은? >> ");
+				scanf("%d", &my_select);
+				Status.next_room = Route_Select(Status.room, my_select);
+
+				//오타 예외 처리
+				if (Status.next_room == 404)
+				{
+					printf("잘못된 선택입니다!\n\n");
+					goto retry;
+				}
+
+				ENTER;
+				WINDOW_CLEAR;
+				printf("%d 번을 선택했습니다.\n", my_select);
+
+				fgetc(stdin);
+
+				Status.room = Status.next_room;
+				Auto_Save(Status.room);
+			}
+
+			if (Script_Buffer[i] == '_') return 1; //게임 끝! 
+		}
+
+		fgetc(stdin); //키입력 대기
+	}
+
+	fclose(Game_Script);
+	return 0;
+}
 
 //게임 인트로 로고
 void intro()
 {
-	printf("┌────『Memorial: 마녀의 기억』─────────────────────────────────────────────────────────┐\n");
-	printf("│                                                                                      │\n");
-	printf("│  **        **                                                                    **  │\n");
-	printf("│  ***      ***                                                                    **  │\n");
-	printf("│  ** *    * **    *****    **  ***  ***        ***     **  ***   **    *****      **  │\n");
-	printf("│  **  *  *  **   **   **   ** **  **   **    **   **   ** ** **             **    **  │\n");
-	printf("│  **   *    **  *********  ***    **    **  **     **  ***       **   ********    **  │\n");
-	printf("│  **        **   **        **     **    **   **   **   **        **  **   ** **   **  │\n");
-	printf("│  **        **    *****    **     **    **     ***     **        **   ******  **  **  │\n");
-	printf("│                                                                                      │\n");
-	printf("│                                                       「Made by 92Tars/ G. R. Han」  │\n");
-	printf("└──────────────────────────────────────────────────────────────────────────────────────┘\n");
-	DOUBLE_ENTER;
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	printf("■                                                                                    ■\n");
-	printf("■        1. 새로하기                  2. 이어하기                  0.끝내기          ■\n");
-	printf("■                                                                                    ■\n");
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	DOUBLE_ENTER;
+	int i = 0;
+	if ((Game_Script = fopen("Script/Intro.txt", "r")) == NULL)
+	{
+		printf("인트로 파일이 존재하지 않습니다!!");
+		fgetc(stdin);
+		exit(1); 
+	}
+
+	while ((buffer = fgetc(Game_Script)) != EOF) printf("%c", buffer); //버퍼출력
 }
 
 //저장하기
@@ -245,16 +234,18 @@ int main_menu()
 	while (true)
 	{
 		DOUBLE_ENTER;
-		printf("메뉴 값을 입력하세요. >>");
+		printf("메뉴 값을 입력하세요. >> ");
 
 		scanf("%d", &a);
 
 		switch (a)
 		{
 		case 1:
+			WINDOW_CLEAR;
 			return 0;
 			break;
 		case 2:
+			WINDOW_CLEAR;
 			return Load_Save();
 			break;
 		case 0:
@@ -266,3 +257,38 @@ int main_menu()
 		}
 	}
 }
+
+//종료화면
+int ending_menu()
+{
+	int a = 0;
+
+	while (true)
+	{
+		DOUBLE_ENTER;
+		printf("게임이 끝났습니다. 다시 진행하시겠습니까?");
+		DOUBLE_ENTER;
+		printf("1. 다시 시작	2. 끝내기");
+		DOUBLE_ENTER;
+		printf("메뉴 값을 입력하세요. >> ");
+
+		scanf("%d", &a);
+
+		switch (a)
+		{
+		case 1:
+			WINDOW_CLEAR;
+			return 0;
+			break;
+
+		case 2:
+			exit(0);
+			break;
+
+		default:
+			printf("잘못된 선택입니다.");
+			break;
+		}
+	}
+}
+
