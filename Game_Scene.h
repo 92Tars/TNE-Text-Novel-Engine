@@ -18,6 +18,7 @@
 #define ENTER printf("\n");
 #define DOUBLE_ENTER printf("\n\n");
 #define WINDOW_CLEAR system("cls");
+#define DEFAULT_SCRIPT_SPEED 10;
 
 #include <stdio.h>
 #include <string.h>
@@ -34,16 +35,17 @@ struct Game_Framework
 char Script_Buffer[500];
 char buffer;
 int my_select = 0;
-
-int script_speed;
+int script_speed = DEFAULT_SCRIPT_SPEED;
 
 FILE *Game_Script;
 Game_Framework Status;
 
 int Game_Loop();
 int Route_Select(int room, int select);
-void Auto_Save(int room_no);
 int Load_Save();
 int main_menu();
 int ending_menu();
+
+void route_check();
+void Auto_Save(int room_no);
 void intro();

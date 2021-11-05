@@ -146,36 +146,29 @@ int Game_Loop()
 
 		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
 		{
-			printf("%c", Script_Buffer[i]); //버퍼출력
-			i++;
-			Sleep(10); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
-
-			//분기점 포인트
-			if (Script_Buffer[i] == '$')
+			//대기
+			if (Script_Buffer[i] == '@') fgetc(stdin); 
+			
+			if (Script_Buffer[i] == '>')
 			{
-				retry:
-				printf("\n당신의 선택은? >> ");
-				scanf("%d", &my_select);
-				Status.next_room = Route_Select(Status.room, my_select);
-
-				//오타 예외 처리
-				if (Status.next_room == 404)
-				{
-					printf("잘못된 선택입니다!\n\n");
-					goto retry;
-				}
-
-				ENTER;
-				WINDOW_CLEAR;
-				printf("%d 번을 선택했습니다.\n", my_select);
-
-				fgetc(stdin);
-
-				Status.room = Status.next_room;
-				Auto_Save(Status.room);
+				int a, b;
+				a = (Script_Buffer[i + 1] - 48) * 10;
+				b = Script_Buffer[i + 2] - 48;
+				script_speed = a + b;
+				i += 3;
+				//printf("속도를 %d 로 변경했습니다. ", script_speed); //디버그 옵션
 			}
 
-			if (Script_Buffer[i] == '_') return 1; //게임 끝! 
+			printf("%c", Script_Buffer[i]); //버퍼출력
+			i++;
+			Sleep(script_speed); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
+
+			//분기점 포인트
+			if (Script_Buffer[i] == '$') route_check();
+
+			//게임 끝! 
+			if (Script_Buffer[i] == '_') return 1; 
+
 		}
 
 		fgetc(stdin); //키입력 대기
@@ -183,6 +176,31 @@ int Game_Loop()
 
 	fclose(Game_Script);
 	return 0;
+}
+
+//분기점 체커
+void route_check()
+{
+	retry:
+	printf("\n당신의 선택은? >> ");
+	scanf("%d", &my_select);
+	Status.next_room = Route_Select(Status.room, my_select);
+
+	//오타 예외 처리
+	if (Status.next_room == 404)
+	{
+		printf("잘못된 선택입니다!\n\n");
+		goto retry;
+	}
+
+	ENTER;
+	WINDOW_CLEAR;
+	printf("%d 번을 선택했습니다.\n", my_select);
+
+	fgetc(stdin);
+
+	Status.room = Status.next_room;
+	Auto_Save(Status.room);
 }
 
 //게임 인트로 로고
