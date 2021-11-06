@@ -130,13 +130,13 @@ int Game_Loop()
 	int i = 0; // Flush init
 
 	//스크립트 출력부
-	while ((buffer = fgetc(Game_Script)) != EOF)//End_Of_Line이 나올 때 까지 출력한다.
+	while ((buffer = fgetc(Game_Script)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
 	{
 		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
 
 		FLUSH;
 
-		while ((buffer = fgetc(Game_Script)) != '@') //'@'표시가 나올 때 까지 Script_Buffer를 채운다.
+		while ((buffer = fgetc(Game_Script)) != '`') //'`'표시가 나올 때 까지 Script_Buffer를 채운다.
 		{
 			Script_Buffer[i] = buffer;
 			i++;
@@ -147,6 +147,7 @@ int Game_Loop()
 
 		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
 		{
+			//출력속도 변경
 			if (Script_Buffer[i] == '>')
 			{
 				int a, b;
@@ -157,10 +158,6 @@ int Game_Loop()
 				//printf("속도를 %d 로 변경했습니다. ", script_speed); //디버그 옵션
 			}
 
-			printf("%c", Script_Buffer[i]); //버퍼출력
-			i++;
-			Sleep(script_speed); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
-
 			//분기점 포인트
 			if (Script_Buffer[i] == '$') 
 			{
@@ -169,7 +166,11 @@ int Game_Loop()
 			}
 			//게임 끝! 
 			if (Script_Buffer[i] == '_') return 1; 
-
+			
+			//버퍼출력
+			printf("%c", Script_Buffer[i]); 
+			i++;
+			Sleep(script_speed); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
 		}
 
 		fgetc(stdin); //키입력 대기
@@ -199,7 +200,6 @@ void route_check()
 	printf("%d 번을 선택했습니다.\n", my_select);
 
 	fgetc(stdin);
-
 	Status.room = Status.next_room;
 	Auto_Save(Status.room);
 }
