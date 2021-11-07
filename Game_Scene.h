@@ -14,11 +14,13 @@
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
+
+#define DEFAULT_SCRIPT_SPEED 10;
+
 #define FLUSH i = 0
 #define ENTER printf("\n");
 #define DOUBLE_ENTER printf("\n\n");
 #define WINDOW_CLEAR system("cls");
-#define DEFAULT_SCRIPT_SPEED 10;
 
 #include <stdio.h>
 #include <string.h>
@@ -32,13 +34,23 @@ struct Game_Framework
 	char room_char;
 };
 
+struct Route_Framework
+{
+  int target_room; //현재 있는 방 번호
+  int select_route; // 선택한 루트 번호
+  int return_room; // 이동할 방 번호
+};
+
 char Script_Buffer[500];
+char Route_Buffer[15];
 char buffer;
 int my_select = 0;
 int script_speed = DEFAULT_SCRIPT_SPEED;
 
 FILE *Game_Script;
+FILE *Game_Route;
 Game_Framework Status;
+Route_Framework Route_Manager[1024]; 
 
 int Game_Loop();
 int Route_Select(int room, int select);
@@ -46,6 +58,7 @@ int Load_Save();
 int main_menu();
 int ending_menu();
 
+void Route_Init();
 void route_check();
 void Auto_Save(int room_no);
 void intro();

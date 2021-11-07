@@ -8,7 +8,7 @@
 															  __/ |
 															 |___/
 
-	TNE (Text Novel Engine) v1.0 by 92Tars
+	TNE (Text Novel Engine) v1.1 by 92Tars
 	Copyright 2018~2021.
 
 */
@@ -30,7 +30,81 @@ int main()
 }
 
 /*          루트 파일 선택
-이 부분을 수정하면 다른 이야기도 만들 수 있다.*/
+이 부분을 수정하면 다른 이야기도 만들 수 있다.
+
+	루트 매니저 array 접근 후
+	room == target_room, select == select_route 에 해당하는 요소 검색 후 return_room 반환
+
+*/
+void Route_Init()
+{
+	//해당하는 대사 스크립트가 없을 시...
+	if ((Game_Route = fopen("Script/Route.txt", "r")) == NULL)
+	{
+		printf(" Route.txt가 발견되지 않았습니다! 게임을 실행할 수 없습니다!");
+		fgetc(stdin);
+		exit(1); 
+	}
+
+	int i = 0;
+	int Manager_index = 0; //Route_Manager index 값
+
+	while ((buffer = fgetc(Game_Route)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
+	{
+		
+
+		for (int i = 0; i < 50; i++) Route_Buffer[i] = NULL; //출력 버퍼 초기화
+
+		FLUSH;
+
+		while ((buffer = fgetc(Game_Route)) != '`') //'`'표시가 나올 때 까지 Route_Buffer를 채운다.
+		{
+			Route_Buffer[i] = buffer;
+			i++;
+		}
+		Route_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
+		
+		FLUSH;
+
+		while (Route_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
+		{
+			//현재 방
+			if (Route_Buffer[i] == '!')
+			{
+				int a, b, c;
+				a = (Route_Buffer[i + 1] - 48) * 100;
+				b = (Route_Buffer[i + 2] - 48) * 10;
+				c = (Route_Buffer[i + 3] - 48);
+				Route_Manager[Manager_index].target_room = a + b + c;
+				i += 4;
+			}
+
+			//고른 선택지
+			if (Route_Buffer[i] == '*') 
+			{
+				int a;
+				a = (Route_Buffer[i + 1] - 48);
+				Route_Manager[Manager_index].select_route = a;
+				i += 2;
+			}
+
+			//가게될 방
+			if (Route_Buffer[i] == '>')
+			{
+				int a, b, c;
+				a = (Route_Buffer[i + 1] - 48) * 100;
+				b = (Route_Buffer[i + 2] - 48) * 10;
+				c = (Route_Buffer[i + 3] - 48);
+				Route_Manager[Manager_index].return_room = a + b + c;
+				i += 4;
+				Manager_index++;
+			}
+		}
+
+		fgetc(stdin); //키입력 대기
+	}
+}
+
 int Route_Select(int room, int select)
 {
 	//Room 1
