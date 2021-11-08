@@ -18,6 +18,14 @@
 
 int main()
 {
+	Route_Init();
+	DEBUG_ROUTE_PRINT();
+	printf("Task Complete");
+
+	fgetc(stdin);
+	return 0;
+
+	/*
 	restart:
 	intro(); 
 	Status.room = main_menu();
@@ -27,6 +35,7 @@ int main()
 
 	fgetc(stdin);
 	return 0;
+	*/
 }
 
 /*          루트 파일 선택
@@ -41,32 +50,32 @@ void Route_Init()
 	//해당하는 대사 스크립트가 없을 시...
 	if ((Game_Route = fopen("Script/Route.txt", "r")) == NULL)
 	{
-		printf(" Route.txt가 발견되지 않았습니다! 게임을 실행할 수 없습니다!");
+		printf("Route.txt가 발견되지 않았습니다! 게임을 실행할 수 없습니다!");
 		fgetc(stdin);
 		exit(1); 
 	}
 
 	int i = 0;
-	int Manager_index = 0; //Route_Manager index 값
+	Route_Framework Temp_RF;
 
 	while ((buffer = fgetc(Game_Route)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
 	{
-		
-
-		for (int i = 0; i < 50; i++) Route_Buffer[i] = NULL; //출력 버퍼 초기화
-
-		FLUSH;
+		//for (int i = 0; i < 50; i++) Route_Buffer[i] = NULL; //버퍼 초기화
+		//printf("버퍼 초기화 완료\n");
+		//FLUSH;
 
 		while ((buffer = fgetc(Game_Route)) != '`') //'`'표시가 나올 때 까지 Route_Buffer를 채운다.
 		{
 			Route_Buffer[i] = buffer;
+			printf("%c",buffer);
 			i++;
 		}
-		Route_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
+		Route_Buffer[i + 1] = '\0'; //루트 버퍼 마무리
+		printf("버퍼 채우기 완료\n");
 		
 		FLUSH;
 
-		while (Route_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
+		while (Route_Buffer[i] != '\0') //루트 버퍼의 끝까지
 		{
 			//현재 방
 			if (Route_Buffer[i] == '!')
@@ -75,8 +84,9 @@ void Route_Init()
 				a = (Route_Buffer[i + 1] - 48) * 100;
 				b = (Route_Buffer[i + 2] - 48) * 10;
 				c = (Route_Buffer[i + 3] - 48);
-				Route_Manager[Manager_index].target_room = a + b + c;
+				Temp_RF.target_room = a + b + c;
 				i += 4;
+				printf("현재방 = %d \n", Temp_RF.target_room);
 			}
 
 			//고른 선택지
@@ -84,8 +94,9 @@ void Route_Init()
 			{
 				int a;
 				a = (Route_Buffer[i + 1] - 48);
-				Route_Manager[Manager_index].select_route = a;
+				Temp_RF.select_route = a;
 				i += 2;
+				printf("선택지 = %d\n", Temp_RF.select_route);
 			}
 
 			//가게될 방
@@ -95,13 +106,27 @@ void Route_Init()
 				a = (Route_Buffer[i + 1] - 48) * 100;
 				b = (Route_Buffer[i + 2] - 48) * 10;
 				c = (Route_Buffer[i + 3] - 48);
-				Route_Manager[Manager_index].return_room = a + b + c;
+				Temp_RF.return_room = a + b + c;
 				i += 4;
-				Manager_index++;
-			}
-		}
+				printf("가게될방 = %d\n", Temp_RF.return_room);
 
-		fgetc(stdin); //키입력 대기
+				Route_List.push_back(Temp_RF);
+				printf("푸시\n");
+				i++;
+			}
+			i++;
+			Temp_RF.target_room = 0;
+			Temp_RF.select_route = 0;
+			Temp_RF.return_room = 0;
+		}
+	}
+}
+
+void DEBUG_ROUTE_PRINT()
+{
+	for(int i = 0; i < Route_List.size(); i++)
+	{
+		printf("Target Room : %d / Select_Route : %d / Return_Room : %d \n", Route_List[i].target_room, Route_List[i].select_route, Route_List[i].return_room);
 	}
 }
 
@@ -206,20 +231,19 @@ int Game_Loop()
 	//스크립트 출력부
 	while ((buffer = fgetc(Game_Script)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
 	{
-		for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
-
-		FLUSH;
+		//for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
+		//FLUSH;
 
 		while ((buffer = fgetc(Game_Script)) != '`') //'`'표시가 나올 때 까지 Script_Buffer를 채운다.
 		{
 			Script_Buffer[i] = buffer;
 			i++;
 		}
-		Script_Buffer[i + 1] = NULL; //스크립트 버퍼 마무리
+		Script_Buffer[i + 1] = '\0'; //스크립트 버퍼 마무리
 		
 		FLUSH;
 
-		while (Script_Buffer[i] != NULL) //스크립트 버퍼의 끝까지
+		while (Script_Buffer[i] != '\0') //스크립트 버퍼의 끝까지
 		{
 			//출력속도 변경
 			if (Script_Buffer[i] == '>')

@@ -25,7 +25,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <vector>
 #include <Windows.h>
+
+using std::vector;
 
 struct Game_Framework
 {
@@ -42,7 +45,7 @@ struct Route_Framework
 };
 
 char Script_Buffer[500];
-char Route_Buffer[15];
+char Route_Buffer[1000];
 char buffer;
 int my_select = 0;
 int script_speed = DEFAULT_SCRIPT_SPEED;
@@ -50,7 +53,7 @@ int script_speed = DEFAULT_SCRIPT_SPEED;
 FILE *Game_Script;
 FILE *Game_Route;
 Game_Framework Status;
-Route_Framework Route_Manager[1024]; 
+vector<Route_Framework> Route_List;
 
 int Game_Loop();
 int Route_Select(int room, int select);
@@ -62,3 +65,6 @@ void Route_Init();
 void route_check();
 void Auto_Save(int room_no);
 void intro();
+
+void DEBUG_ROUTE_PRINT();
+
