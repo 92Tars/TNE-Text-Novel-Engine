@@ -26,6 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
+#include <algorithm>
 #include <Windows.h>
 
 using std::vector;
@@ -44,8 +45,8 @@ struct Route_Framework
   int return_room; // 이동할 방 번호
 };
 
-char Script_Buffer[500];
-char Route_Buffer[1000];
+char Script_Buffer[1024];
+char Route_Buffer[128];
 char buffer;
 int my_select = 0;
 int script_speed = DEFAULT_SCRIPT_SPEED;
