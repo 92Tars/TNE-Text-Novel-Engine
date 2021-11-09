@@ -18,14 +18,16 @@
 
 int main()
 {
-	Route_Init();
+    /*
+	
 	DEBUG_ROUTE_PRINT();
 	printf("Task Complete");
 
 	fgetc(stdin);
 	return 0;
+    */
 
-	/*
+    Route_Init();
 	restart:
 	intro(); 
 	Status.room = main_menu();
@@ -35,7 +37,7 @@ int main()
 
 	fgetc(stdin);
 	return 0;
-	*/
+	
 }
 
 /*          루트 파일 선택
@@ -60,18 +62,15 @@ void Route_Init()
 
 	while ((buffer = fgetc(Game_Route)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
 	{
-		//for (int i = 0; i < 50; i++) Route_Buffer[i] = NULL; //버퍼 초기화
-		//printf("버퍼 초기화 완료\n");
-		//FLUSH;
+		FLUSH;
 
 		while ((buffer = fgetc(Game_Route)) != '`') //'`'표시가 나올 때 까지 Route_Buffer를 채운다.
 		{
 			Route_Buffer[i] = buffer;
-			printf("%c",buffer);
+		    //printf("%c", buffer);
 			i++;
 		}
 		Route_Buffer[i + 1] = '\0'; //루트 버퍼 마무리
-		printf("버퍼 채우기 완료\n");
 		
 		FLUSH;
 
@@ -86,7 +85,7 @@ void Route_Init()
 				c = (Route_Buffer[i + 3] - 48);
 				Temp_RF.target_room = a + b + c;
 				i += 4;
-				printf("현재방 = %d \n", Temp_RF.target_room);
+				//printf("현재방 = %d \n", Temp_RF.target_room);
 			}
 
 			//고른 선택지
@@ -96,7 +95,7 @@ void Route_Init()
 				a = (Route_Buffer[i + 1] - 48);
 				Temp_RF.select_route = a;
 				i += 2;
-				printf("선택지 = %d\n", Temp_RF.select_route);
+				//printf("선택지 = %d\n", Temp_RF.select_route);
 			}
 
 			//가게될 방
@@ -108,10 +107,10 @@ void Route_Init()
 				c = (Route_Buffer[i + 3] - 48);
 				Temp_RF.return_room = a + b + c;
 				i += 4;
-				printf("가게될방 = %d\n", Temp_RF.return_room);
+				//printf("가게될방 = %d\n", Temp_RF.return_room);
 
 				Route_List.push_back(Temp_RF);
-				printf("푸시\n");
+				//printf("푸시\n");
 				i++;
 			}
 			i++;
@@ -132,6 +131,12 @@ void DEBUG_ROUTE_PRINT()
 
 int Route_Select(int room, int select)
 {
+    for(int i = 0; i < Route_List.size(); i++)
+    {
+       if(Route_List[i].target_room == room && Route_List[i].select_route == select) return Route_List[i].return_room;
+    }
+    return 404;
+    /*
 	//Room 1
 	if (room == 0 && select == 4) return 20;
 	else if (room == 0 && select == 1) return 11;
@@ -206,6 +211,7 @@ int Route_Select(int room, int select)
 
 	//Exeption Filter
 	else return 404;
+    */
 }
 
 //게임 작동부
@@ -225,14 +231,13 @@ int Game_Loop()
 		fgetc(stdin);
 		exit(1); 
 	}
+    //printf("현재 방은 %s 입니다.", File_name);
 
-	int i = 0; // Flush init
 
 	//스크립트 출력부
-	while ((buffer = fgetc(Game_Script)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
-	{
-		//for (int i = 0; i < 500; i++) Script_Buffer[i] = NULL; //출력 버퍼 초기화
-		//FLUSH;
+	while ((buffer = fgetc(Game_Script) != EOF)) //End_Of_Line이 나올 때 까지 반복한다.
+	{   
+        int i = 0; // Flush init
 
 		while ((buffer = fgetc(Game_Script)) != '`') //'`'표시가 나올 때 까지 Script_Buffer를 채운다.
 		{
@@ -273,7 +278,6 @@ int Game_Loop()
 
 		fgetc(stdin); //키입력 대기
 	}
-
 	fclose(Game_Script);
 	return 0;
 }
