@@ -18,22 +18,13 @@
 
 int main()
 {
-    /*
-	
-	DEBUG_ROUTE_PRINT();
-	printf("Task Complete");
-
-	fgetc(stdin);
-	return 0;
-    */
-
-    Route_Init();
+    routeInit();
 	restart:
 	intro(); 
-	Status.room = main_menu();
-	while(true) if (Game_Loop() == 1) break;
+	status.room = mainMenu();
+	while(true) if (gameLoop() == 1) break;
 	
-	if (ending_menu() == 0) goto restart;
+	if (endingMenu() == 0) goto restart;
 
 	fgetc(stdin);
 	return 0;
@@ -47,10 +38,10 @@ int main()
 	room == target_room, select == select_route 에 해당하는 요소 검색 후 return_room 반환
 
 */
-void Route_Init()
+void routeInit()
 {
 	//해당하는 대사 스크립트가 없을 시...
-	if ((Game_Route = fopen("Script/Route.txt", "r")) == NULL)
+	if ((game_route = fopen("Script/Route.txt", "r")) == NULL)
 	{
 		printf("Route.txt가 발견되지 않았습니다! 게임을 실행할 수 없습니다!");
 		fgetc(stdin);
@@ -58,61 +49,57 @@ void Route_Init()
 	}
 
 	int i = 0;
-	Route_Framework Temp_RF;
+	route_framework Temp_RF;
 
-	while ((buffer = fgetc(Game_Route)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
+	while ((buffer = fgetc(game_route)) != EOF) //End_Of_Line이 나올 때 까지 반복한다.
 	{
 		FLUSH;
 
-		while ((buffer = fgetc(Game_Route)) != '`') //'`'표시가 나올 때 까지 Route_Buffer를 채운다.
+		while ((buffer = fgetc(game_route)) != '`') //'`'표시가 나올 때 까지 route_buffer를 채운다.
 		{
-			Route_Buffer[i] = buffer;
-		    //printf("%c", buffer);
+			route_buffer[i] = buffer;
 			i++;
 		}
-		Route_Buffer[i + 1] = '\0'; //루트 버퍼 마무리
+		route_buffer[i + 1] = '\0'; //루트 버퍼 마무리
 		
 		FLUSH;
 
-		while (Route_Buffer[i] != '\0') //루트 버퍼의 끝까지
+		while (route_buffer[i] != '\0') //루트 버퍼의 끝까지
 		{
 			//현재 방
-			if (Route_Buffer[i] == '!')
+			if (route_buffer[i] == '!')
 			{
 				int a, b, c;
-				a = (Route_Buffer[i + 1] - 48) * 100;
-				b = (Route_Buffer[i + 2] - 48) * 10;
-				c = (Route_Buffer[i + 3] - 48);
+				a = (route_buffer[i + 1] - 48) * 100;
+				b = (route_buffer[i + 2] - 48) * 10;
+				c = (route_buffer[i + 3] - 48);
 				Temp_RF.target_room = a + b + c;
 				i += 4;
-				//printf("현재방 = %d \n", Temp_RF.target_room);
 			}
 
 			//고른 선택지
-			if (Route_Buffer[i] == '*') 
+			if (route_buffer[i] == '*') 
 			{
 				int a;
-				a = (Route_Buffer[i + 1] - 48);
+				a = (route_buffer[i + 1] - 48);
 				Temp_RF.select_route = a;
 				i += 2;
-				//printf("선택지 = %d\n", Temp_RF.select_route);
 			}
 
 			//가게될 방
-			if (Route_Buffer[i] == '>')
+			if (route_buffer[i] == '>')
 			{
 				int a, b, c;
-				a = (Route_Buffer[i + 1] - 48) * 100;
-				b = (Route_Buffer[i + 2] - 48) * 10;
-				c = (Route_Buffer[i + 3] - 48);
+				a = (route_buffer[i + 1] - 48) * 100;
+				b = (route_buffer[i + 2] - 48) * 10;
+				c = (route_buffer[i + 3] - 48);
 				Temp_RF.return_room = a + b + c;
 				i += 4;
-				//printf("가게될방 = %d\n", Temp_RF.return_room);
 
-				Route_List.push_back(Temp_RF);
-				//printf("푸시\n");
+				route_list.push_back(Temp_RF);
 				i++;
 			}
+
 			i++;
 			Temp_RF.target_room = 0;
 			Temp_RF.select_route = 0;
@@ -121,35 +108,28 @@ void Route_Init()
 	}
 }
 
-void DEBUG_ROUTE_PRINT()
-{
-	for(int i = 0; i < Route_List.size(); i++)
-	{
-		printf("Target Room : %d / Select_Route : %d / Return_Room : %d \n", Route_List[i].target_room, Route_List[i].select_route, Route_List[i].return_room);
-	}
-}
 
-int Route_Select(int room, int select)
+int routeSelect(int room, int select)
 {
-    for(int i = 0; i < Route_List.size(); i++)
+    for(int i = 0; i < route_list.size(); i++)
     {
-       if(Route_List[i].target_room == room && Route_List[i].select_route == select) return Route_List[i].return_room;
+       if(route_list[i].target_room == room && route_list[i].select_route == select) return route_list[i].return_room;
     }
     return 404;
 }
 
 //게임 작동부
-int Game_Loop()
+int gameLoop()
 {
 	//텍스트 파일 불러오는 곳
 	char File_name[32] = "Script/Script_";
-	sprintf(&Status.room_char, "%d", Status.room);
-	strcat(File_name, &Status.room_char);
+	sprintf(&status.room_char, "%d", status.room);
+	strcat(File_name, &status.room_char);
 	strcat(File_name, ".txt");
 	//-----------------------
 
 	//해당하는 대사 스크립트가 없을 시...
-	if ((Game_Script = fopen(File_name, "r")) == NULL)
+	if ((game_script = fopen(File_name, "r")) == NULL)
 	{
 		printf(" '%s' 라는 게임 대사 스크립트가 발견되지 않았습니다! 게임을 실행할 수 없습니다!", File_name);
 		fgetc(stdin);
@@ -159,63 +139,63 @@ int Game_Loop()
 
 
 	//스크립트 출력부
-	while ((buffer = fgetc(Game_Script) != EOF)) //End_Of_Line이 나올 때 까지 반복한다.
+	while ((buffer = fgetc(game_script) != EOF)) //End_Of_Line이 나올 때 까지 반복한다.
 	{   
         int i = 0; // Flush init
 
-		while ((buffer = fgetc(Game_Script)) != '`') //'`'표시가 나올 때 까지 Script_Buffer를 채운다.
+		while ((buffer = fgetc(game_script)) != '`') //'`'표시가 나올 때 까지 script_buffer를 채운다.
 		{
-			Script_Buffer[i] = buffer;
+			script_buffer[i] = buffer;
 			i++;
 		}
-		Script_Buffer[i + 1] = '\0'; //스크립트 버퍼 마무리
+		script_buffer[i + 1] = '\0'; //스크립트 버퍼 마무리
 		
 		FLUSH;
 
-		while (Script_Buffer[i] != '\0') //스크립트 버퍼의 끝까지
+		while (script_buffer[i] != '\0') //스크립트 버퍼의 끝까지
 		{
 			//출력속도 변경
-			if (Script_Buffer[i] == '>')
+			if (script_buffer[i] == '>')
 			{
 				int a, b;
-				a = (Script_Buffer[i + 1] - 48) * 10;
-				b = Script_Buffer[i + 2] - 48;
+				a = (script_buffer[i + 1] - 48) * 10;
+				b = script_buffer[i + 2] - 48;
 				script_speed = a + b;
 				i += 3;
 				//printf("속도를 %d 로 변경했습니다. ", script_speed); //디버그 옵션
 			}
 
 			//분기점 포인트
-			if (Script_Buffer[i] == '$') 
+			if (script_buffer[i] == '$') 
 			{
-				if(Script_Buffer[i + 1] == '$') i++;
-				else route_check();
+				if(script_buffer[i + 1] == '$') i++;
+				else routeCheck();
 			}
 			//게임 끝! 
-			if (Script_Buffer[i] == '_') return 1; 
+			if (script_buffer[i] == '_') return 1; 
 			
 			//버퍼출력
-			printf("%c", Script_Buffer[i]); 
+			printf("%c", script_buffer[i]); 
 			i++;
 			Sleep(script_speed); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
 		}
 
 		fgetc(stdin); //키입력 대기
 	}
-	fclose(Game_Script);
+	fclose(game_script);
 	return 0;
 }
 
 //분기점 체커
-void route_check()
+void routeCheck()
 {
 	retry:
 	printf("\n당신의 선택은? >> ");
 	scanf("%d", &my_select);
-	Status.next_room = Route_Select(Status.room, my_select);
+	status.next_room = routeSelect(status.room, my_select);
 
 	//오타 예외 처리
-	if (Status.next_room == 404)
+	if (status.next_room == 404)
 	{
 		printf("잘못된 선택입니다!\n\n");
 		goto retry;
@@ -226,26 +206,26 @@ void route_check()
 	printf("%d 번을 선택했습니다.\n", my_select);
 
 	fgetc(stdin);
-	Status.room = Status.next_room;
-	Auto_Save(Status.room);
+	status.room = status.next_room;
+	autoSave(status.room);
 }
 
 //게임 인트로 로고
 void intro()
 {
 	int i = 0;
-	if ((Game_Script = fopen("Script/Intro.txt", "r")) == NULL)
+	if ((game_script = fopen("Script/Intro.txt", "r")) == NULL)
 	{
 		printf("인트로 파일이 존재하지 않습니다!!");
 		fgetc(stdin);
 		exit(1); 
 	}
 
-	while ((buffer = fgetc(Game_Script)) != EOF) printf("%c", buffer); //버퍼출력
+	while ((buffer = fgetc(game_script)) != EOF) printf("%c", buffer); //버퍼출력
 }
 
 //저장하기
-void Auto_Save(int room_no)
+void autoSave(int room_no)
 {
 	FILE *save_file;
 
@@ -258,7 +238,7 @@ void Auto_Save(int room_no)
 }
 
 //이어하기
-int Load_Save()
+int loadSave()
 {
 
 	int room_no;
@@ -272,7 +252,7 @@ int Load_Save()
 }
 
 //메인메뉴
-int main_menu() 
+int mainMenu() 
 {
 	int a = 0;
 
@@ -291,7 +271,7 @@ int main_menu()
 			break;
 		case 2:
 			WINDOW_CLEAR;
-			return Load_Save();
+			return loadSave();
 			break;
 		case 0:
 			exit(0);
@@ -304,7 +284,7 @@ int main_menu()
 }
 
 //종료화면
-int ending_menu()
+int endingMenu()
 {
 	int a = 0;
 
@@ -337,3 +317,10 @@ int ending_menu()
 	}
 }
 
+void DEBUG_ROUTE_PRINT()
+{
+	for(int i = 0; i < route_list.size(); i++)
+	{
+		printf("Target Room : %d / Select_Route : %d / Return_Room : %d \n", route_list[i].target_room, route_list[i].select_route, route_list[i].return_room);
+	}
+}

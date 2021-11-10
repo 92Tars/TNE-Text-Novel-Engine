@@ -26,45 +26,44 @@
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
-#include <algorithm>
 #include <Windows.h>
 
 using std::vector;
 
-struct Game_Framework
+struct game_framework
 {
 	int room = 0;
 	int next_room = 0;
 	char room_char;
 };
 
-struct Route_Framework
+struct route_framework
 {
   int target_room; //현재 있는 방 번호
   int select_route; // 선택한 루트 번호
   int return_room; // 이동할 방 번호
 };
 
-char Script_Buffer[1024];
-char Route_Buffer[128];
+char script_buffer[1024];
+char route_buffer[128];
 char buffer;
 int my_select = 0;
 int script_speed = DEFAULT_SCRIPT_SPEED;
 
-FILE *Game_Script;
-FILE *Game_Route;
-Game_Framework Status;
-vector<Route_Framework> Route_List;
+FILE *game_script;
+FILE *game_route;
+game_framework status;
+vector<route_framework> route_list;
 
-int Game_Loop();
-int Route_Select(int room, int select);
-int Load_Save();
-int main_menu();
-int ending_menu();
+int gameLoop();
+int routeSelect(int room, int select);
+int loadSave();
+int mainMenu();
+int endingMenu();
 
-void Route_Init();
-void route_check();
-void Auto_Save(int room_no);
+void routeInit();
+void routeCheck();
+void autoSave(int room_no);
 void intro();
 
 void DEBUG_ROUTE_PRINT();
