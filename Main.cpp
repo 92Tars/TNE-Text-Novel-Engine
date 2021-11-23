@@ -204,7 +204,7 @@ void routeCheck()
 	ENTER;
 	WINDOW_CLEAR;
 	printf("%d 번을 선택했습니다.\n", my_select);
-
+	//이 부분부터 입력 대기를 받아야함!!!
 	fgetc(stdin);
 	status.room = status.next_room;
 	autoSave(status.room);
