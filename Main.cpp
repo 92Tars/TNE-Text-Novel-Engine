@@ -108,7 +108,6 @@ void routeInit()
 	}
 }
 
-
 int routeSelect(int room, int select)
 {
     for(int i = 0; i < route_list.size(); i++)
@@ -126,22 +125,21 @@ int gameLoop()
 	sprintf(&status.room_char, "%d", status.room);
 	strcat(File_name, &status.room_char);
 	strcat(File_name, ".txt");
-	//-----------------------
 
 	//해당하는 대사 스크립트가 없을 시...
 	if ((game_script = fopen(File_name, "r")) == NULL)
 	{
 		printf(" '%s' 라는 게임 대사 스크립트가 발견되지 않았습니다! 게임을 실행할 수 없습니다!", File_name);
-		fgetc(stdin);
+
+		breakFlagCheck();
 		exit(1); 
 	}
-    //printf("현재 방은 %s 입니다.", File_name);
-
+    //printf("현재 방은 %s 입니다.", File_name); //디버그 옵션
 
 	//스크립트 출력부
-	while ((buffer = fgetc(game_script) != EOF)) //End_Of_Line이 나올 때 까지 반복한다.
+	while ((buffer = fgetc(game_script) != EOF)) //End_Of_Line이 나올 때 까지 반복한다. (텍스트 전체 출력)
 	{   
-        int i = 0; // Flush init
+        int i = 0; // Index init
 
 		while ((buffer = fgetc(game_script)) != '`') //'`'표시가 나올 때 까지 script_buffer를 채운다.
 		{
@@ -180,7 +178,8 @@ int gameLoop()
 			Sleep(script_speed); // 숫자를 바꿔서 빠르게도, 느리게도 출력이 가능함.
 		}
 
-		fgetc(stdin); //키입력 대기
+		//키입력 대기
+		breakFlagCheck();
 	}
 	fclose(game_script);
 	return 0;
@@ -204,10 +203,20 @@ void routeCheck()
 	ENTER;
 	WINDOW_CLEAR;
 	printf("%d 번을 선택했습니다.\n", my_select);
-	//이 부분부터 입력 대기를 받아야함!!!
-	fgetc(stdin);
+
+	fflush(stdout);
+	//입력대기
+	breakFlagCheck();
+
 	status.room = status.next_room;
 	autoSave(status.room);
+}
+
+void breakFlagCheck()
+{
+	// 이러면 2번 입력받아야함...
+	FLUSH_INPUT_BUFFER;
+	while(!getch()); //키입력대기
 }
 
 //게임 인트로 로고

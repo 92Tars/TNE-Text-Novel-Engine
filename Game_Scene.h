@@ -15,14 +15,18 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
-#define DEFAULT_SCRIPT_SPEED 10;
+#define DEFAULT_SCRIPT_SPEED 10
 
 #define FLUSH i = 0
-#define ENTER printf("\n");
-#define DOUBLE_ENTER printf("\n\n");
-#define WINDOW_CLEAR system("cls");
+#define FLUSH_INPUT_BUFFER while(getchar()!='\n')
+
+#define ENTER printf("\n")
+#define DOUBLE_ENTER printf("\n\n")
+#define WINDOW_CLEAR system("cls")
+
 
 #include <stdio.h>
+#include <conio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
@@ -65,6 +69,7 @@ void routeInit();
 void routeCheck();
 void autoSave(int room_no);
 void intro();
+void breakFlagCheck();
 
 void DEBUG_ROUTE_PRINT();
 
