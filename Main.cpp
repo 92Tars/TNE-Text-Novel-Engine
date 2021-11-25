@@ -22,7 +22,7 @@ int main()
 	restart:
 	intro(); 
 	status.room = mainMenu();
-	while(true) if (gameLoop() == 1) break;
+	while(true){ if(gameLoop() == 1) break; }
 	
 	if (endingMenu() == 0) goto restart;
 
@@ -167,7 +167,12 @@ int gameLoop()
 			if (script_buffer[i] == '$') 
 			{
 				if(script_buffer[i + 1] == '$') i++;
-				else routeCheck();
+				else 
+				{
+					i++;
+					routeCheck();
+					FLUSH_BUFFER;
+				}
 			}
 			//게임 끝! 
 			if (script_buffer[i] == '_') return 1; 
@@ -190,7 +195,8 @@ void routeCheck()
 {
 	retry:
 	printf("\n당신의 선택은? >> ");
-	scanf("%d", &my_select);
+	FLUSH_BUFFER;
+	scanf(" %d", &my_select);
 	status.next_room = routeSelect(status.room, my_select);
 
 	//오타 예외 처리
@@ -204,19 +210,14 @@ void routeCheck()
 	WINDOW_CLEAR;
 	printf("%d 번을 선택했습니다.\n", my_select);
 
-	fflush(stdout);
-	//입력대기
-	breakFlagCheck();
-
 	status.room = status.next_room;
 	autoSave(status.room);
 }
 
 void breakFlagCheck()
 {
-	// 이러면 2번 입력받아야함...
-	FLUSH_INPUT_BUFFER;
-	while(!getch()); //키입력대기
+	FLUSH_BUFFER;
+	while(!GetAsyncKeyState(VK_RETURN));
 }
 
 //게임 인트로 로고
@@ -226,7 +227,7 @@ void intro()
 	if ((game_script = fopen("Script/Intro.txt", "r")) == NULL)
 	{
 		printf("인트로 파일이 존재하지 않습니다!!");
-		fgetc(stdin);
+		
 		exit(1); 
 	}
 
@@ -270,7 +271,8 @@ int mainMenu()
 		DOUBLE_ENTER;
 		printf("메뉴 값을 입력하세요. >> ");
 
-		scanf("%d", &a);
+		scanf(" %d", &a);
+		getchar();
 
 		switch (a)
 		{
@@ -306,7 +308,8 @@ int endingMenu()
 		DOUBLE_ENTER;
 		printf("메뉴 값을 입력하세요. >> ");
 
-		scanf("%d", &a);
+		scanf(" %d", &a);
+		getchar();
 
 		switch (a)
 		{

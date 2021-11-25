@@ -16,9 +16,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #define DEFAULT_SCRIPT_SPEED 10
+#define KEY_ENTER 13
 
 #define FLUSH i = 0
-#define FLUSH_INPUT_BUFFER while(getchar()!='\n')
+#define FLUSH_BUFFER cin.ignore(INT_MAX, '\n');
 
 #define ENTER printf("\n")
 #define DOUBLE_ENTER printf("\n\n")
@@ -31,7 +32,9 @@
 #include <stdlib.h>
 #include <vector>
 #include <Windows.h>
+#include <iostream>
 
+using namespace std;
 using std::vector;
 
 struct game_framework
@@ -51,6 +54,7 @@ struct route_framework
 char script_buffer[1024];
 char route_buffer[128];
 char buffer;
+char garb;
 int my_select = 0;
 int script_speed = DEFAULT_SCRIPT_SPEED;
 
